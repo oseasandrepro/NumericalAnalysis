@@ -12,7 +12,7 @@
 /*
     Compute the "root" of f using the Secant method and return the "root"
 */
-long double SecantMethod( long double (*f)(int n, ...), long double x0, long double x1, long double tol);
+long double SecantMethod( long double (*f)(int n, ...), long double x0, long double x1, long double tol, unsigned int *niter);
 
 /* f(x) =  x^5+x^4-3.3; root: 1.117329744559439*/
 long double f(int n,...);
@@ -20,21 +20,26 @@ long double f(int n,...);
 
 int main(void)
 {
-    long double x0, x1;
+    long double x0, x1, x;
+    unsigned int niter = 0;
 
     x0 = 2;
     x1 = 3; 
 
-    printf("root: ");
-    printf(OUTPUT_FORMAT, SecantMethod(f, x0, x1, TOL) ); printf("\n");
+    
+    x = SecantMethod(f, x0, x1, TOL, &niter);
+    printf("%u iterations\n", niter);
+    printf("x = ");
+    printf(OUTPUT_FORMAT, x ); printf("\n");
 
     return 0;
 }
 
 
-long double SecantMethod( long double (*f)(int n, ...), long double x0, long double x1, long double tol)
+long double SecantMethod( long double (*f)(int n, ...), long double x0, long double x1, long double tol, unsigned int *niter)
 {
     long double k = 0.0;
+    unsigned int cont = 0;
 
     while( fabs( f(1, x1) ) > tol )
     {
@@ -42,8 +47,10 @@ long double SecantMethod( long double (*f)(int n, ...), long double x0, long dou
         k = x1 - f(1, x1) * (x0 - x1) / ( f(1, x0) - f(1, x1) );
         x0 = x1;
         x1 = k;
+        cont++;
     }
 
+    *niter = cont;
     return x1;
 }
 

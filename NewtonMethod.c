@@ -14,7 +14,7 @@
     expect: f and fl as function with variable number of arguments. furthermore fl is mathematically the derivative of f
     Compute the "root" of f using the Newton's method and return the "root"
 */
-long double NewtonMethod( long double (*f)(int n, ...), long double (*df)(int n, ...), long double x0, long double tol);
+long double NewtonMethod( long double (*f)(int n, ...), long double (*df)(int n, ...), long double x0, long double tol, unsigned int *niter);
 
 /* f(x) =  x^5+x^4-3.3; root: 1.117329744559439*/
 long double f(int n,...);
@@ -25,27 +25,35 @@ long double df(int n, ...);
 int main(void)
 {
     long double x0;
+    long double x;
+    unsigned int niter = 0;
 
     //x0 = 1.1173; 
     x0 = 0.5;
 
-    printf("root: ");
-    printf(OUTPUT_FORMAT, NewtonMethod(f, df, x0, TOL) ); printf("\n");
+    x = NewtonMethod(f, df, x0, TOL, &niter);
+    printf("%u iterations\n", niter);
+    printf("x = ");
+    printf(OUTPUT_FORMAT, x); printf("\n");
 
     return 0;
 }
 
 
-long double NewtonMethod( long double (*f)(int n, ...), long double (*df)(int n, ...), long double x0, long double tol)
+long double NewtonMethod( long double (*f)(int n, ...), long double (*df)(int n, ...), long double x0, long double tol, unsigned int *niter)
 {
     long double k = 0.0;
+    unsigned int cont = 0;
 
     while ( fabs( f(1, x0) ) > tol )
     {
         k = x0 - f(1, x0) / df(1, x0);
         x0 = k;
+        
+        cont++;
     }
 
+    *niter = cont;
     return x0;
 }
 

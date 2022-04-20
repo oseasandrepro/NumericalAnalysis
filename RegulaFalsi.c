@@ -14,7 +14,7 @@
     expect: f as function with variable number of arguments.
     compute the simple Regula Falsi method.
 */
-long double Regulafalsi( long double(f)(int, ...), long double a, long double b, long double tol);
+long double Regulafalsi( long double(f)(int, ...), long double a, long double b, long double tol, unsigned int *niter);
 
 long double myfunction1(int, ...);
 long double myfunction2(int, ...);
@@ -22,13 +22,15 @@ long double myfunction2(int, ...);
 int main(void)
 {
     long double a, b, x;
+    int niter = 0;
 
     a = -4;
     b = 4;
 
-    x = Regulafalsi(myfunction2, a, b, TOL);
+    x = Regulafalsi(myfunction1, a, b, TOL, &niter);
 
-    printf("%LG\n", x);
+    printf("%u iterations\n", niter);
+    printf("x = %LG\n", x);
 
     return 0;
 }
@@ -65,20 +67,25 @@ long double myfunction2(int n, ...)
     return value;
 }
 
-long double Regulafalsi( long double(f)(int,...), long double a, long double b, long double tol)
+long double Regulafalsi( long double(f)(int, ...), long double a, long double b, long double tol, unsigned int *niter)
 {
     long double error = LONG_MAX;
     long double c = 0.0;
+    
+    unsigned int cont = 0;
 
     while( error > tol)
     {
         c = ( a * f(1, b) - b * f(1,a) ) / ( f(1, b) - f(1, a) );
         if( f(1, a)*f(1,c) < 0 )
             b = c;
-        else if( f(1, b)*f(1, c) < 0)
+        else if( f(1, b) * f(1, c) < 0)
             a = c;
         error = fabs(f(1, c));
+        
+        cont++;
     }
-
+    
+    *niter = cont;
     return c;
 }
